@@ -6,16 +6,20 @@ BUNDLE_ID="com.hanolee.websitemenubar"
 VERSION="${1:-1.0.0}"
 BUILD_NUMBER="${2:-1}"
 
-BUILD_DIR=".build/release"
 APP_DIR="$APP_NAME.app"
 CONTENTS_DIR="$APP_DIR/Contents"
 MACOS_DIR="$CONTENTS_DIR/MacOS"
 RESOURCES_DIR="$CONTENTS_DIR/Resources"
 
-echo "▶ Building $APP_NAME $VERSION ($BUILD_NUMBER) for arm64 + x86_64"
-swift build -c release \
-    -Xswiftc -target -Xswiftc arm64-apple-macos13.0 \
-    --arch arm64 --arch x86_64
+echo "▶ Building $APP_NAME $VERSION ($BUILD_NUMBER) for arm64"
+swift build -c release --arch arm64 \
+    -Xswiftc -target -Xswiftc arm64-apple-macos13.0
+ARM64_BIN=".build/arm64-apple-macosx/release/$APP_NAME"
+
+echo "▶ Building $APP_NAME $VERSION ($BUILD_NUMBER) for x86_64"
+swift build -c release --arch x86_64 \
+    -Xswiftc -target -Xswiftc x86_64-apple-macos13.0
+X86_64_BIN=".build/x86_64-apple-macosx/release/$APP_NAME"
 
 if [[ ! -f "AppIcon.icns" ]]; then
     echo "▶ AppIcon.icns not found, generating..."
@@ -23,10 +27,11 @@ if [[ ! -f "AppIcon.icns" ]]; then
     iconutil -c icns AppIcon.iconset -o AppIcon.icns
 fi
 
-echo "▶ Assembling $APP_DIR"
+echo "▶ Assembling $APP_DIR (universal)"
 rm -rf "$APP_DIR"
 mkdir -p "$MACOS_DIR" "$RESOURCES_DIR"
-cp "$BUILD_DIR/$APP_NAME" "$MACOS_DIR/$APP_NAME"
+lipo -create "$ARM64_BIN" "$X86_64_BIN" -output "$MACOS_DIR/$APP_NAME"
+lipo -info "$MACOS_DIR/$APP_NAME" | sed 's/^/   /'
 cp "AppIcon.icns" "$RESOURCES_DIR/AppIcon.icns"
 
 cat > "$CONTENTS_DIR/Info.plist" <<PLIST
