@@ -1,6 +1,7 @@
 # Website MenuBar
 
 자주 방문하는 웹사이트를 맥 메뉴바에 모아두고 클릭 한 번으로 여는 가벼운 macOS 앱.
+<img width="68" height="38" alt="image" src="https://github.com/user-attachments/assets/6a95818f-0e5c-4e02-9a76-e7fe701bd03a" />
 
 - SwiftUI `MenuBarExtra` 기반, Dock 아이콘 없음 (`LSUIElement`)
 - 로컬 JSON 저장 (`~/Library/Application Support/WebsiteMenuBar/websites.json`)
